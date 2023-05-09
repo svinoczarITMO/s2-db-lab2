@@ -33,27 +33,27 @@ WHERE Н_ОТДЕЛЫ.КОРОТКОЕ_ИМЯ = 'КТиУ'
 GROUP BY Н_ЛЮДИ.ОТЧЕСТВО;
 
 -- №5 --
-WITH max_score AS (
-SELECT MAX(CASE l."ОЦЕНКА" WHEN 'зачет' THEN 5 WHEN 'незач' THEN 2 END) AS max_score
-FROM "Н_УЧЕНИКИ" st
-INNER JOIN "Н_ОБУЧЕНИЯ" ed ON ed."ЧЛВК_ИД" = st."ЧЛВК_ИД"
-INNER JOIN "Н_ВЕДОМОСТИ" l ON l."ЧЛВК_ИД" = ed."ЧЛВК_ИД"
-WHERE st."ГРУППА" = '3100'
+with max_score as (
+select max(case в."ОЦЕНКА" when 'зачет' then 5 when 'незач' then 2 end) as max_score
+from "Н_УЧЕНИКИ" у
+inner join "Н_ОБУЧЕНИЯ" о on о."ЧЛВК_ИД" = у."ЧЛВК_ИД"
+inner join "Н_ВЕДОМОСТИ" в on в."ЧЛВК_ИД" = о."ЧЛВК_ИД"
+where у."ГРУППА" = '3100'
 )
-SELECT
-st."ИД",
-concat(p."ФАМИЛИЯ", ' ', p."ИМЯ", ' ', p."ОТЧЕСТВО") AS "ФИО",
-avg(CASE l."ОЦЕНКА" WHEN 'зачет' THEN 5 WHEN 'незач' THEN 2 END) AS "Ср_оценка"
-FROM "Н_УЧЕНИКИ" st
-INNER JOIN "Н_ОБУЧЕНИЯ" ed ON ed."ЧЛВК_ИД" = st."ЧЛВК_ИД"
-INNER JOIN "Н_ЛЮДИ" p ON p."ИД" = ed."ЧЛВК_ИД"
-INNER JOIN "Н_ВЕДОМОСТИ" l ON l."ЧЛВК_ИД" = p."ИД"
-WHERE st."ГРУППА" = '4100'
-GROUP BY st."ИД", p."ФАМИЛИЯ", p."ИМЯ", p."ОТЧЕСТВО"
-HAVING avg(CASE l."ОЦЕНКА" WHEN 'зачет' THEN 5 WHEN 'незач' THEN 2 END) <= (
-SELECT max_score.max_score FROM max_score
+select
+у."ИД",
+concat(л."ФАМИЛИЯ", ' ', л."ИМЯ", ' ', л."ОТЧЕСТВО") AS "ФИО",
+avg(case в."ОЦЕНКА" when 'зачет' then 5 when 'незач' then 2 end) as "Ср_оценка"
+from "Н_УЧЕНИКИ" у
+inner join "Н_ОБУЧЕНИЯ" о on о."ЧЛВК_ИД" = у."ЧЛВК_ИД"
+inner join "Н_ЛЮДИ" л on л."ИД" = о."ЧЛВК_ИД"
+inner join "Н_ВЕДОМОСТИ" в on в."ЧЛВК_ИД" = л."ИД"
+where у."ГРУППА" = '4100'
+group by у."ИД", л."ФАМИЛИЯ", л."ИМЯ", л."ОТЧЕСТВО"
+having avg(case в."ОЦЕНКА" when 'зачет' then 5 when 'незач' then 2 end) <= (
+select max_score.max_score from max_score
 )
-ORDER BY st."ИД";
+order by у."ИД";
 
 -- №6 --
 select distinct st."ГРУППА", concat(p."ФАМИЛИЯ", ' ', p."ИМЯ", ' ', p."ОТЧЕСТВО") as "ФИО", st."П_ПРКОК_ИД"
@@ -66,6 +66,13 @@ where p."ИД" in (
     from "Н_УЧЕНИКИ" st
     where "ПРИЗНАК" = 'отчисл'
     ) and st."КОГДА_ИЗМЕНИЛ" < '2012-09-01' and ef."НАИМЕНОВАНИЕ" = 'Заочная';
+
+-- №7 --
+select с1.ИД, с1.ФАМИЛИЯ, с1.ИМЯ, с2.ИД, с2.ФАМИЛИЯ, с2.ИМЯ
+from "Н_ЛЮДИ" с1
+inner join Н_ЛЮДИ с2 on с1.ФАМИЛИЯ = с2.ФАМИЛИЯ and с1.ИД <> с2.ИД
+order by с1.ФАМИЛИЯ;
+
 
 -- for tests --
 select * from "Н_УЧЕНИКИ";
