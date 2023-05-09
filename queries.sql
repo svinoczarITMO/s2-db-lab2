@@ -55,6 +55,17 @@ SELECT max_score.max_score FROM max_score
 )
 ORDER BY st."ИД";
 
+-- №6 --
+select distinct st."ГРУППА", concat(p."ФАМИЛИЯ", ' ', p."ИМЯ", ' ', p."ОТЧЕСТВО") as "ФИО", st."П_ПРКОК_ИД"
+from "Н_ЛЮДИ" p inner join "Н_ОБУЧЕНИЯ" ed ON ed."ЧЛВК_ИД"=p."ИД"
+                inner join "Н_УЧЕНИКИ" st ON ed."ЧЛВК_ИД"=st."ЧЛВК_ИД"
+                inner join "Н_ПЛАНЫ" pl ON pl."ИД"=st."ПЛАН_ИД"
+                inner join "Н_ФОРМЫ_ОБУЧЕНИЯ" ef ON pl."ФО_ИД" = ef."ИД"
+where p."ИД" in (
+    select distinct "ИД"
+    from "Н_УЧЕНИКИ" st
+    where "ПРИЗНАК" = 'отчисл'
+    ) and st."КОГДА_ИЗМЕНИЛ" < '2012-09-01' and ef."НАИМЕНОВАНИЕ" = 'Заочная';
 
 -- for tests --
 select * from "Н_УЧЕНИКИ";
