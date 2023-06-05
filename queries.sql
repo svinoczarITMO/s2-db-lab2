@@ -96,18 +96,18 @@ order by с1."ФАМИЛИЯ";
 
 select
 uch."ГРУППА",
-count(distinct case when ved."ОЦЕНКА" = '5' then uch."ЧЛВК_ИД" end) as "Отличники",
+count(distinct case when ved."ОЦЕНКА" in ('5', 'зачёт') then uch."ЧЛВК_ИД" end) as "Отличники",
 count(distinct case when EXISTS (
 select 1 from "Н_СОДЕРЖАНИЯ_ЭЛЕМЕНТОВ_СТРОК"
-where "ИД" = ved."СЭС_ИД" and "ОЦЕНКА" <> '5'
-) then uch."ЧЛВК_ИД" end) as "Двоечники"
+where "ИД" = ved."СЭС_ИД" and "ОЦЕНКА" in ('2', 'незач', 'неявка', 'осв')
+) then uch."ЧЛВК_ИД" end) as "Двоечники", pl."УЧЕБНЫЙ_ГОД"
 from "Н_УЧЕНИКИ" uch
+join "Н_ПЛАНЫ" pl on uch."ПЛАН_ИД" = pl."ИД"
 join "Н_ВЕДОМОСТИ" ved on (uch."ЧЛВК_ИД"=ved."ЧЛВК_ИД")
 join "Н_СОДЕРЖАНИЯ_ЭЛЕМЕНТОВ_СТРОК" ses on (ved."СЭС_ИД"=ses."ИД")
 join "Н_ЭЛЕМЕНТЫ_СТРОК" es on (ses."ЭСТ_ИД" = es."ИД")
 join "Н_СТРОКИ_ПЛАНОВ" plan on (es."СПЛ_ИД" = plan."ИД")
-group by uch."ГРУППА";
-
+group by uch."ГРУППА", pl."УЧЕБНЫЙ_ГОД";
 
 
 -- for tests --
@@ -119,3 +119,4 @@ select * from "Н_КВАЛИФИКАЦИИ";
 select * from "Н_ПЛАНЫ";
 select * from "Н_ОТДЕЛЫ";
 select * from "Н_ВЕДОМОСТИ";
+
